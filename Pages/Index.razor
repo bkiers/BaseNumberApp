@@ -64,6 +64,22 @@ else
 
     <MudText Typo="Typo.h5" Class="mb-3 mt-5">Encode text</MudText>
 
+    <table>
+        <tr>
+            <th style="text-align:left; padding-right: 10px">Letter</th>
+            <th style="text-align:left; padding-right: 10px">Decimal</th>
+            <th style="text-align:left">Base @this.Base</th>
+        </tr>
+        @foreach (var (c, i) in "abcdefghijklmnopqrstuvwxyz".ToCharArray().Select((c, i) => (c, i)))
+        {
+            <tr>
+                <td><code>@c</code></td>
+                <td><code>@(i + 1)</code></td>
+                <td><code>@(new Number(this.Base, i + 1, this.Digits))</code></td>
+            </tr>
+        }
+    </table>
+
     <MudTextField
         T="string"
         Label="Text"
@@ -75,7 +91,7 @@ else
 
     @if (!string.IsNullOrWhiteSpace(this.Text))
     {
-        <MudText Typo="Typo.body1">
+        <MudText Typo="Typo.body1" Class="mb-8">
             Encoding the text '@this.Text' using the system <code>A=1</code>, <code>B=2</code>, <code>...</code>,
             <code>Z=26</code> would result in the decimal numbers: <code>[@(string.Join(", ", this.DecimalNumbers()))]</code>.
             The numbers in base @this.Base with digits @this.Digits are: <code>[@(string.Join(", ", this.OtherBaseNumbers()))]</code>
