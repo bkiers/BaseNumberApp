@@ -1,0 +1,85 @@
+﻿@page "/"
+@page "/{Base:int}"
+@page "/{Base:int}/{Digits}"
+@page "/{Base:int}/{Digits}/{Text}"
+
+@using BaseNumberApp.Models
+
+<PageTitle>Base Number App</PageTitle>
+
+<MudSelect
+    T="int"
+    Label="Base number"
+    @bind-Value="@this.Base"
+    Class="mb-3">
+    @foreach (var n in Enumerable.Range(2, 15))
+    {
+        <MudSelectItem T="int" Value="@n">@n</MudSelectItem>
+    }
+</MudSelect>
+
+<MudTextField
+    T="string"
+    Label="Digits"
+    Variant="Variant.Text"
+    Value="@this.Digits"
+    ValueChanged="@this.DigitsChanged"
+    Immediate="@true"
+    Class="mb-5"/>
+
+@if (this.Digits.Length != this.Base)
+{
+    <MudText Typo="Typo.body1">
+        The size of the digits must equal the size of the base: in this case, the digits are expected to
+        contain @this.Base characters (for example: '@DefaultDigits[..this.Base]').
+    </MudText>
+}
+else
+{
+    var numbers = new List<int>();
+    var exampleBaseNumber = new Number(this.Base, this.example, this.Digits);
+
+    <MudText Typo="Typo.h5" Class="mb-3 mt-5">Example</MudText>
+
+    <MudText Typo="Typo.body1" Class="mb-3">
+        The decimal number <strong>@example</strong> in base @this.Base with digits '@this.Digits' is: <strong>@exampleBaseNumber</strong>:
+    </MudText>
+
+    @foreach (var (digit, index) in exampleBaseNumber.ToString().Select((c, i) => (exampleBaseNumber.ToInt($"{c}"), i)))
+    {
+        var power = exampleBaseNumber.ToString().Length - index - 1;
+        numbers.Add((int)(digit * Math.Pow(this.Base, power)));
+
+        <MudText Typo="Typo.caption">
+            <strong>@this.Digits[digit]</strong> &rarr;
+            @digit × @this.Base<sup>@power</sup> =
+            @digit × @Math.Pow(this.Base, power) =
+            @(digit * Math.Pow(this.Base, power))
+        </MudText><br>
+    }
+
+    <MudText Typo="Typo.body2" Class="mt-3">
+        @string.Join(" + ", numbers.Where(n => n > 0)) = @numbers.Sum()
+    </MudText>
+
+    <MudText Typo="Typo.h5" Class="mb-3 mt-5">Encode text</MudText>
+
+    <MudTextField
+        T="string"
+        Label="Text"
+        Variant="Variant.Text"
+        Value="@this.Text"
+        ValueChanged="@this.TextChanged"
+        Immediate="@true"
+        Class="mb-5 mt-5"/>
+
+    @if (!string.IsNullOrWhiteSpace(this.Text))
+    {
+        <MudText Typo="Typo.body1">
+            Encoding the text '@this.Text' using the system <code>A=1</code>, <code>B=2</code>, <code>...</code>,
+            <code>Z=26</code> would result in the decimal numbers: <code>[@(string.Join(", ", this.DecimalNumbers()))]</code>.
+            The numbers in base @this.Base with digits @this.Digits are: <code>[@(string.Join(", ", this.OtherBaseNumbers()))]</code>
+        </MudText>
+    }
+}
+
